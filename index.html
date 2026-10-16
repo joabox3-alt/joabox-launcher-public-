@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>조아박스 제작관리</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#236DAB">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="조아박스">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="robots" content="noindex">
+<style>
+  :root { --brand: #236DAB; --ink: #1B2130; --ink2: #4A5568; --line: #DDE3EA; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { display: grid; place-items: center; min-height: 100vh; padding: 24px 16px; background: #F3F6F9; color: var(--ink);
+    font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  main { width: 100%; max-width: 420px; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px 22px; text-align: center; box-shadow: 0 10px 30px rgba(23, 79, 128, .08); }
+  .ic { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+  h1 { margin: 16px 0 4px; font-size: 22px; }
+  p { margin: 8px 0; color: var(--ink2); line-height: 1.6; word-break: keep-all; }
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; margin-top: 12px; border: 0; border-radius: 12px;
+    background: var(--brand); color: #fff; font: inherit; font-size: 17px; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .btn.ghost { background: #fff; color: var(--brand); border: 1.5px solid var(--brand); }
+  .btn.small { min-height: 40px; font-size: 14.5px; font-weight: 600; }
+  .box { margin-top: 16px; padding: 14px; border-radius: 12px; background: #F6F8FB; text-align: left; font-size: 14.5px; line-height: 1.7; color: var(--ink2); }
+  .box b { color: var(--ink); }
+  .hide { display: none !important; }
+  .spin { width: 22px; height: 22px; margin: 14px auto 0; border: 3px solid #D6E4F2; border-top-color: var(--brand); border-radius: 50%; animation: s .8s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .warn { background: #FFF4E5; color: #8A4B00; }
+  label.f { display: block; margin-top: 14px; text-align: left; font-size: 14px; font-weight: 700; color: var(--ink2); }
+  input.in { width: 100%; min-height: 48px; margin-top: 6px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; font-size: 15px; }
+  input.in:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
+  .msg { min-height: 20px; margin-top: 8px; font-size: 13.5px; color: #B42318; text-align: left; }
+  .links { display: flex; gap: 8px; margin-top: 12px; }
+  .links .btn { margin-top: 0; }
+</style>
+</head>
+<body>
+<main>
+  <img class="ic" src="icon-192.png" alt="">
+  <h1>조아박스 제작관리</h1>
+
+  <!-- 설치된 앱(홈 화면 아이콘)으로 열었을 때: 바로 제작관리로 이동 -->
+  <div id="opening" class="hide">
+    <p>앱을 여는 중이에요…</p>
+    <div class="spin"></div>
+    <a class="btn ghost" id="openLink2" href="#">열리지 않으면 여기를 누르세요</a>
+  </div>
+
+  <!-- 앱 주소가 아직 없을 때: 한 번만 붙여 넣기 (이 기기에만 저장, 저장소에는 안 올라감) -->
+  <div id="setup" class="hide">
+    <p>처음 한 번만 <b>앱 주소</b>를 붙여 넣어 주세요.<br>관리자에게 받은 주소(…/exec로 끝남)예요.</p>
+    <label class="f" for="urlIn">앱 주소</label>
+    <input class="in" id="urlIn" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="msg" id="urlMsg" role="status"></div>
+    <button class="btn" id="saveBtn" type="button">저장하고 열기</button>
+  </div>
+
+  <!-- 브라우저로 열었을 때: 설치 안내 -->
+  <div id="guide" class="hide">
+    <p>휴대폰 홈 화면에 설치하면 앱처럼 바로 열 수 있어요.</p>
+    <button class="btn hide" id="installBtn" type="button">앱 설치하기</button>
+    <div class="box" id="howAndroid"><b>안드로이드 (크롬)</b><br>오른쪽 위 <b>⋮</b> 메뉴 → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b></div>
+    <div class="box" id="howIos"><b>아이폰 (사파리)</b><br>아래 가운데 <b>공유</b> 버튼(네모에 화살표) → <b>홈 화면에 추가</b> → <b>추가</b><br>설치한 아이콘으로 처음 열 때 앱 주소를 한 번 더 물어볼 수 있어요.</div>
+    <a class="btn ghost" id="openLink" href="#">설치하지 않고 바로 열기</a>
+    <div class="links">
+      <button class="btn ghost small" id="shareBtn" type="button">동료에게 보낼 링크 복사</button>
+      <button class="btn ghost small" id="resetBtn" type="button">앱 주소 바꾸기</button>
+    </div>
+    <div class="msg" id="shareMsg" role="status" style="color:#1E7A45"></div>
+  </div>
+</main>
+<script>
+  // (선택) 앱 주소를 여기에 직접 적어 둘 수도 있어요. 단, 공개 저장소에 올리면 누구나 이 주소를 볼 수 있어요.
+  // 비워 두면 처음 열 때 주소를 한 번 붙여 넣고, 그 기기에만 저장합니다 (권장).
+  var APP_URL = '';
+
+  (function () {
+    var KEY = 'joa.appUrl';
+    var $ = function (id) { return document.getElementById(id); };
+    var show = function (id) { $(id).classList.remove('hide'); };
+    var hide = function (id) { $(id).classList.add('hide'); };
+    var valid = function (u) { return /^https:\/\/script\.google\.com\/(a\/[^\/]+\/)?macros\/s\/[A-Za-z0-9_-]+\/(exec|dev)(\?.*)?$/.test(String(u || '').trim()); };
+    var load = function () { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } };
+    var save = function (u) { try { localStorage.setItem(KEY, u); return true; } catch (e) { return false; } };
+    if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) { /* 무시 */ } }
+
+    // 동료에게 받은 링크(…?app=주소)로 열면 그 주소를 이 기기에 저장하고 주소창에서는 지움
+    var m = /[?&]app=([^&#]+)/.exec(location.search);
+    if (m) {
+      var fromLink = decodeURIComponent(m[1]);
+      if (valid(fromLink)) save(fromLink.trim());
+      try { history.replaceState(null, '', location.pathname); } catch (e) { /* 옛 브라우저 */ }
+    }
+    var url = valid(APP_URL) ? APP_URL.trim() : load();
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+
+    function openApp(u) {
+      show('opening'); $('openLink2').href = u;
+      window.location.replace(u);
+    }
+    function setup() {
+      hide('guide'); show('setup');
+      $('urlIn').value = url || '';
+      $('saveBtn').onclick = function () {
+        var u = $('urlIn').value.trim();
+        if (!valid(u)) { $('urlMsg').textContent = '주소가 올바르지 않아요. https://script.google.com/macros/s/… 로 시작하고 /exec 로 끝나는 주소를 붙여 넣어 주세요.'; return; }
+        save(u); url = u; hide('setup');
+        if (standalone) openApp(u); else guide();
+      };
+    }
+    function guide() {
+      show('guide');
+      $('openLink').href = url;
+      var ua = navigator.userAgent || '';
+      var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+      if (ios) hide('howAndroid'); else hide('howIos');
+      $('resetBtn').onclick = function () { setup(); };
+      if (valid(APP_URL)) hide('resetBtn');
+      $('shareBtn').onclick = function () {
+        var link = location.origin + location.pathname + '?app=' + encodeURIComponent(url);
+        var done = function () { $('shareMsg').textContent = '복사했어요. 카톡 등으로 동료에게 보내 주세요 (공개된 곳에는 올리지 마세요).'; };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { prompt('이 링크를 복사해 주세요', link); });
+        else prompt('이 링크를 복사해 주세요', link);
+      };
+    }
+
+    if (!url) { setup(); }
+    else if (standalone) { openApp(url); return; }
+    else { guide(); }
+
+    // 안드로이드 크롬: 설치 버튼
+    var deferred = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault(); deferred = e; if (url) show('installBtn');
+    });
+    $('installBtn').addEventListener('click', function () {
+      if (!deferred) return;
+      deferred.prompt();
+      deferred.userChoice.then(function () { deferred = null; hide('installBtn'); });
+    });
+    window.addEventListener('appinstalled', function () { hide('installBtn'); });
+  })();
+</script>
+</body>
+</html>
